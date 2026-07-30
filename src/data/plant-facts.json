@@ -1,0 +1,89 @@
+{
+  "id": "plant-progress-example",
+  "title": "Plant vocabulary",
+  "lifetimePoints": 200,
+  "wordBankUnlocked": true,
+  "reviewUnlocked": true,
+  "createdAt": "2026-07-22T00:00:00.000Z",
+  "updatedAt": "2026-07-22T00:00:00.000Z",
+  "terms": [
+    {
+      "id": "plant-petiole",
+      "term": "Petiole",
+      "description": "The stalk joining a leaf to a stem",
+      "points": 0,
+      "attempts": 0,
+      "correct": 0,
+      "streak": 0,
+      "bestStreak": 0,
+      "flashcardExposures": 0,
+      "wordBankRounds": 0,
+      "reviewRounds": 0
+    },
+    {
+      "id": "plant-sepal",
+      "term": "Sepal",
+      "description": "A leaf-like part protecting a flower bud",
+      "points": 10,
+      "attempts": 0,
+      "correct": 0,
+      "streak": 0,
+      "bestStreak": 0,
+      "flashcardExposures": 2,
+      "wordBankRounds": 0,
+      "reviewRounds": 0
+    },
+    {
+      "id": "plant-rhizome",
+      "term": "Rhizome",
+      "description": "A horizontal underground plant stem",
+      "points": 20,
+      "attempts": 0,
+      "correct": 0,
+      "streak": 0,
+      "bestStreak": 0,
+      "flashcardExposures": 4,
+      "wordBankRounds": 0,
+      "reviewRounds": 0
+    },
+    {
+      "id": "plant-stomata",
+      "term": "Stomata",
+      "description": "Tiny pores that control gas exchange in a leaf",
+      "points": 30,
+      "attempts": 1,
+      "correct": 1,
+      "streak": 1,
+      "bestStreak": 1,
+      "flashcardExposures": 4,
+      "wordBankRounds": 1,
+      "reviewRounds": 0
+    },
+    {
+      "id": "plant-xylem",
+      "term": "Xylem",
+      "description": "Tissue that carries water upward through a plant",
+      "points": 60,
+      "attempts": 4,
+      "correct": 4,
+      "streak": 4,
+      "bestStreak": 4,
+      "flashcardExposures": 4,
+      "wordBankRounds": 3,
+      "reviewRounds": 1
+    },
+    {
+      "id": "plant-chlorophyll",
+      "term": "Chlorophyll",
+      "description": "The green pigment that absorbs light for photosynthesis",
+      "points": 80,
+      "attempts": 6,
+      "correct": 6,
+      "streak": 6,
+      "bestStreak": 6,
+      "flashcardExposures": 4,
+      "wordBankRounds": 3,
+      "reviewRounds": 3
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import {
   makeCloze,
   makeLetterBank,
   makeTerm,
+  migrateLegacyExamples,
   normalizeAnswer,
   safeSets,
   seed,
@@ -21,7 +22,7 @@ export default function Home(){
   const fileRef=useRef<HTMLInputElement>(null);
   // Browser storage is intentionally restored after the first client render.
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(()=>{try{const saved=localStorage.getItem("pocket-flashcards-v1");setSets(saved?safeSets(JSON.parse(saved)):seed)}catch{setSets(seed)}setReady(true)},[]);
+  useEffect(()=>{try{const saved=localStorage.getItem("pocket-flashcards-v1");setSets(saved?migrateLegacyExamples(safeSets(JSON.parse(saved))):seed)}catch{setSets(seed)}setReady(true)},[]);
   useEffect(()=>{if(ready)localStorage.setItem("pocket-flashcards-v1",JSON.stringify(sets))},[sets,ready]);
   const active=view.kind!=="library"?sets.find(s=>s.id===view.id):undefined;
   const update=(id:string,fn:(s:StudySet)=>StudySet)=>setSets(xs=>xs.map(s=>{if(s.id!==id)return s;const next=fn(s);const allFlash=next.terms.length>0&&next.terms.every(t=>t.flashcardExposures>=4);const allBank=next.terms.length>0&&next.terms.every(t=>t.wordBankRounds>=3);return {...next,wordBankUnlocked:next.wordBankUnlocked||allFlash,reviewUnlocked:next.reviewUnlocked||allBank,updatedAt:new Date().toISOString()}}));

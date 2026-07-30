@@ -1,3 +1,6 @@
+import maramataka from "./data/maramataka.json" with { type: "json" };
+import plantFacts from "./data/plant-facts.json" with { type: "json" };
+
 export type Term = {
   id: string;
   term: string;
@@ -44,75 +47,51 @@ export const makeTerm = (term: string, description: string): Term => ({
   reviewRounds: 0,
 });
 
+const maramatakaCreatedAt = "2026-07-22T00:00:00.000Z";
+
 export const seed: StudySet[] = [
+  plantFacts as StudySet,
   {
-    id: "spanish",
-    title: "Spanish essentials",
-    lifetimePoints: 230,
-    wordBankUnlocked: true,
-    reviewUnlocked: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    terms: [
-      {
-        ...makeTerm("la ventana", "window"),
-        flashcardExposures: 4,
-        wordBankRounds: 3,
-        reviewRounds: 2,
-        points: 70,
-        attempts: 5,
-        correct: 5,
-        streak: 5,
-        bestStreak: 5,
-      },
-      {
-        ...makeTerm("el jardín", "garden"),
-        flashcardExposures: 4,
-        wordBankRounds: 3,
-        reviewRounds: 1,
-        points: 60,
-        attempts: 4,
-        correct: 4,
-        streak: 4,
-        bestStreak: 4,
-      },
-      {
-        ...makeTerm("la llave", "key"),
-        flashcardExposures: 4,
-        wordBankRounds: 3,
-        points: 50,
-        attempts: 3,
-        correct: 3,
-        streak: 3,
-        bestStreak: 3,
-      },
-      {
-        ...makeTerm("despacio", "slowly"),
-        flashcardExposures: 4,
-        wordBankRounds: 3,
-        points: 50,
-        attempts: 3,
-        correct: 3,
-        streak: 3,
-        bestStreak: 3,
-      },
-    ],
-  },
-  {
-    id: "botany",
-    title: "Backyard botany",
+    id: "maramataka-ngati-kahungunu",
+    title: maramataka.title,
     lifetimePoints: 0,
     wordBankUnlocked: false,
     reviewUnlocked: false,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    terms: [
-      makeTerm("Petiole", "The stalk joining a leaf to a stem"),
-      makeTerm("Sepal", "A leaf-like part protecting a flower bud"),
-      makeTerm("Rhizome", "A horizontal underground plant stem"),
-    ],
+    createdAt: maramatakaCreatedAt,
+    updatedAt: maramatakaCreatedAt,
+    terms: maramataka.terms.map(({ term, description }, index) => ({
+      ...makeTerm(term, description),
+      id: `maramataka-${index + 1}`,
+    })),
   },
 ];
+
+const isLegacyExample = (set: StudySet) =>
+  (set.title === "Spanish essentials" &&
+    set.terms.map((term) => term.term).join("|") ===
+      "la ventana|el jardín|la llave|despacio") ||
+  (set.title === "Backyard botany" &&
+    set.terms
+      .slice(0, 3)
+      .map((term) => term.term)
+      .join("|") === "Petiole|Sepal|Rhizome") ||
+  (set.title === "Plant facts" &&
+    set.terms.map((term) => term.term).join("|") ===
+      "Petiole|Sepal|Rhizome|leaf");
+
+export const migrateLegacyExamples = (sets: StudySet[]) => {
+  if (!sets.some(isLegacyExample)) return sets;
+  const customSets = sets.filter((set) => !isLegacyExample(set));
+  const examples = seed
+    .filter(
+      (example) => !customSets.some((set) => set.title === example.title),
+    )
+    .map((set) => ({
+      ...set,
+      terms: set.terms.map((term) => ({ ...term })),
+    }));
+  return [...examples, ...customSets];
+};
 
 export const completion = (term: Term) =>
   Math.round(
@@ -192,7 +171,7 @@ export const safeSets = (value: unknown): StudySet[] => {
     }
 
     const now = new Date().toISOString();
-    let terms = imported.terms.map((candidateTerm) => {
+    const terms = imported.terms.map((candidateTerm) => {
       const term =
         candidateTerm && typeof candidateTerm === "object"
           ? (candidateTerm as Record<string, unknown>)
@@ -209,20 +188,6 @@ export const safeSets = (value: unknown): StudySet[] => {
         reviewRounds: Math.min(3, Number(term.reviewRounds) || 0),
       };
     });
-
-    const isOldSpanishExample =
-      imported.title === "Spanish essentials" &&
-      terms.map((term) => term.term).join("|") ===
-        "la ventana|el jardín|la llave|despacio" &&
-      terms
-        .map(
-          (term) =>
-            `${term.flashcardExposures}-${term.wordBankRounds}-${term.reviewRounds}`,
-        )
-        .join("|") === "4-3-2|4-2-0|0-0-0|0-0-0";
-    if (isOldSpanishExample) {
-      terms = seed[0].terms.map((term) => ({ ...term, id: uid() }));
-    }
 
     const allFlash =
       terms.length > 0 && terms.every((term) => term.flashcardExposures >= 4);

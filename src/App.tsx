@@ -1,69 +1,24 @@
-"use client";
-
 import { useEffect, useMemo, useRef, useState } from "react";
-
-type Term = { id:string; term:string; description:string; points:number; attempts:number; correct:number; streak:number; bestStreak:number; flashcardExposures:number; wordBankRounds:number; reviewRounds:number };
-type StudySet = { id:string; title:string; terms:Term[]; lifetimePoints:number; wordBankUnlocked:boolean; reviewUnlocked:boolean; createdAt:string; updatedAt:string };
-type View = { kind:"library" } | { kind:"set"; id:string } | { kind:"study"; id:string; stage:"flash"|"bank"|"review" };
-
-const uid = () => crypto.randomUUID();
-const makeTerm = (term:string, description:string):Term => ({id:uid(),term,description,points:0,attempts:0,correct:0,streak:0,bestStreak:0,flashcardExposures:0,wordBankRounds:0,reviewRounds:0});
-const seed:StudySet[] = [
-  {id:"spanish",title:"Spanish essentials",lifetimePoints:230,wordBankUnlocked:true,reviewUnlocked:true,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),terms:[
-    {...makeTerm("la ventana","window"),flashcardExposures:4,wordBankRounds:3,reviewRounds:2,points:70,attempts:5,correct:5,streak:5,bestStreak:5},
-    {...makeTerm("el jardín","garden"),flashcardExposures:4,wordBankRounds:3,reviewRounds:1,points:60,attempts:4,correct:4,streak:4,bestStreak:4},
-    {...makeTerm("la llave","key"),flashcardExposures:4,wordBankRounds:3,points:50,attempts:3,correct:3,streak:3,bestStreak:3},
-    {...makeTerm("despacio","slowly"),flashcardExposures:4,wordBankRounds:3,points:50,attempts:3,correct:3,streak:3,bestStreak:3} ]},
-  {id:"botany",title:"Backyard botany",lifetimePoints:0,wordBankUnlocked:false,reviewUnlocked:false,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),terms:[makeTerm("Petiole","The stalk joining a leaf to a stem"),makeTerm("Sepal","A leaf-like part protecting a flower bud"),makeTerm("Rhizome","A horizontal underground plant stem")]},
-];
-
-const completion = (t:Term) => Math.round((
-  Math.min(t.flashcardExposures,4)/4+
-  Math.min(t.wordBankRounds,3)/3+
-  Math.min(t.reviewRounds,3)/3
-)/3*100);
-const completed = (s:StudySet) => s.terms.filter(t=>completion(t)===100).length;
-const stageFor = (s:StudySet):"flash"|"bank"|"review" => s.terms.some(t=>t.flashcardExposures<4)?"flash":s.terms.some(t=>t.wordBankRounds<3)?"bank":"review";
-const normalizeAnswer = (value:string) => value.normalize("NFC").trim().toLocaleLowerCase();
-const makeCloze = (value:string, fraction:number, seed:string) => {
-  const characters=Array.from(value);
-  const candidates=characters.map((character,index)=>({character,index})).filter(({character})=>/[\p{L}\p{N}]/u.test(character));
-  let state=Array.from(seed).reduce((hash,character)=>(hash*31+character.codePointAt(0)!)>>>0,2166136261);
-  const shuffled=[...candidates].sort(()=>{state=(state*1664525+1013904223)>>>0;return (state/4294967296)-0.5});
-  const hidden=new Set(shuffled.slice(0,Math.max(1,Math.ceil(candidates.length*fraction))).map(({index})=>index));
-  return {masked:characters.map((character,index)=>hidden.has(index)?"_":character).join(""),missing:characters.filter((_,index)=>hidden.has(index)).join("")};
-};
-const makeLetterBank = (value:string, seed:string) => {
-  const letters=Array.from(value).map((letter,index)=>({letter,index}));
-  let state=Array.from(seed).reduce((hash,character)=>(hash*33+character.codePointAt(0)!)>>>0,5381);
-  for(let index=letters.length-1;index>0;index--){state=(state*1664525+1013904223)>>>0;const target=Math.floor((state/4294967296)*(index+1));[letters[index],letters[target]]=[letters[target],letters[index]]}
-  return letters;
-};
-const safeSets = (value:unknown):StudySet[] => {
-  const raw = Array.isArray(value)?value:[value];
-  if(!raw.length) throw new Error("No study sets found");
-  return raw.map(candidate=>{
-    if(!candidate || typeof candidate!=="object") throw new Error("That file is not a Pocket Flashcards backup");
-    const x=candidate as Record<string,unknown>;
-    if(!x || typeof x.title!=="string" || !Array.isArray(x.terms)) throw new Error("That file is not a Pocket Flashcards backup");
-    const now=new Date().toISOString();
-    let terms=x.terms.map(candidateTerm=>{
-      const t=candidateTerm && typeof candidateTerm==="object"?candidateTerm as Record<string,unknown>:{};
-      return {...makeTerm(String(t.term||""),String(t.description||"")),points:Number(t.points)||0,attempts:Number(t.attempts)||0,correct:Number(t.correct)||0,streak:Number(t.streak)||0,bestStreak:Number(t.bestStreak)||0,flashcardExposures:Math.min(4,Number(t.flashcardExposures)||0),wordBankRounds:Math.min(3,Number(t.wordBankRounds)||0),reviewRounds:Math.min(3,Number(t.reviewRounds)||0)};
-    });
-    const isOldSpanishExample=x.title==="Spanish essentials"&&terms.map((t:Term)=>t.term).join("|")==="la ventana|el jardín|la llave|despacio"&&terms.map((t:Term)=>`${t.flashcardExposures}-${t.wordBankRounds}-${t.reviewRounds}`).join("|")==="4-3-2|4-2-0|0-0-0|0-0-0";
-    if(isOldSpanishExample) terms=seed[0].terms.map(t=>({...t,id:uid()}));
-    const allFlash=terms.length>0&&terms.every((t:Term)=>t.flashcardExposures>=4);
-    const allBank=terms.length>0&&terms.every((t:Term)=>t.wordBankRounds>=3);
-    return {id:uid(),title:x.title.trim()||"Imported set",lifetimePoints:terms.reduce((sum:number,t:Term)=>sum+t.points,0),wordBankUnlocked:Boolean(x.wordBankUnlocked)||allFlash||terms.some((t:Term)=>t.wordBankRounds>0||t.reviewRounds>0),reviewUnlocked:Boolean(x.reviewUnlocked)||allBank||terms.some((t:Term)=>t.reviewRounds>0),createdAt:x.createdAt||now,updatedAt:now,terms};
-  });
-};
+import {
+  completed,
+  completion,
+  makeCloze,
+  makeLetterBank,
+  makeTerm,
+  normalizeAnswer,
+  safeSets,
+  seed,
+  stageFor,
+  type StudySet,
+  type Term,
+  type View,
+} from "./study";
 
 export default function Home(){
   const [sets,setSets]=useState<StudySet[]>([]); const [ready,setReady]=useState(false); const [view,setView]=useState<View>({kind:"library"});
   const [modal,setModal]=useState<null|"new"|"rename"|"delete"|"term"|"reset-review"|"reset-term">(null); const [draft,setDraft]=useState(""); const [desc,setDesc]=useState(""); const [editId,setEditId]=useState<string|null>(null); const [notice,setNotice]=useState("");
   const fileRef=useRef<HTMLInputElement>(null);
-  // Browser storage is intentionally restored only after server hydration.
+  // Browser storage is intentionally restored after the first client render.
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(()=>{try{const saved=localStorage.getItem("pocket-flashcards-v1");setSets(saved?safeSets(JSON.parse(saved)):seed)}catch{setSets(seed)}setReady(true)},[]);
   useEffect(()=>{if(ready)localStorage.setItem("pocket-flashcards-v1",JSON.stringify(sets))},[sets,ready]);

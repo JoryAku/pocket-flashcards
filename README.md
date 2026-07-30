@@ -1,7 +1,12 @@
 # Pocket Flashcards
 
+[![Checks](https://github.com/JoryAku/pocket-flashcards/actions/workflows/ci.yml/badge.svg)](https://github.com/JoryAku/pocket-flashcards/actions/workflows/ci.yml)
+[![Deploy to GitHub Pages](https://github.com/JoryAku/pocket-flashcards/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/JoryAku/pocket-flashcards/actions/workflows/deploy-pages.yml)
+
 Pocket Flashcards is a browser-based study app for creating small study sets,
 practising them through progressive exercises, and tracking mastery.
+
+**Live app:** <https://joryaku.github.io/pocket-flashcards/>
 
 ## Features
 
@@ -16,19 +21,36 @@ practising them through progressive exercises, and tracking mastery.
 Pocket Flashcards requires Node.js 22.13 or newer.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Open the local address shown in the terminal.
+Open the address shown in the terminal.
 
-## Verify a production build
+## Check a change
 
 ```bash
-npm run build
+npm run check
 ```
+
+This runs linting, unit tests, TypeScript checks, and the production build.
+
+## Deployment
+
+Changes merged into `main` are checked and deployed to GitHub Pages by
+`.github/workflows/deploy-pages.yml`. Pull requests run the same checks without
+deploying.
 
 ## Data and backups
 
-Study data is stored in the current browser. Export important sets as JSON to
-create a portable backup before clearing browser data or moving devices.
+Study data is stored in the current browser. Export important sets as JSON
+before clearing browser data or moving devices.
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[Code of Conduct](CODE_OF_CONDUCT.md) before opening a pull request.
+
+## License
+
+Pocket Flashcards is available under the [MIT License](LICENSE).

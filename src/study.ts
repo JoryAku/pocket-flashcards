@@ -28,7 +28,7 @@ export type View =
   | { kind: "set"; id: string }
   | { kind: "study"; id: string; stage: "flash" | "bank" | "review" };
 
-const uid = () => crypto.randomUUID();
+export const uid = () => crypto.randomUUID();
 
 export const makeTerm = (term: string, description: string): Term => ({
   id: uid(),

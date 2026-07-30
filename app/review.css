@@ -1,0 +1,216 @@
+.flashcard .card-divider {
+  margin-bottom: 34px;
+}
+
+.flashcard .card-divider + p {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.cloze-term {
+  font-family: Georgia, serif;
+  font-size: 46px !important;
+  letter-spacing: 0.12em;
+  white-space: pre-wrap;
+}
+
+.review-description {
+  display: block;
+  color: var(--muted);
+  font: 18px Georgia, serif;
+  margin-top: 16px;
+}
+
+.review .prompt {
+  padding-bottom: 38px;
+}
+
+.review .prompt > p {
+  margin-bottom: 22px;
+}
+
+.resolved-term {
+  max-width: 520px;
+  margin: 4px auto 32px;
+  padding: 20px 0 24px;
+  border-bottom: 1px solid var(--ink);
+  text-align: left;
+}
+
+.resolved-term span {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.resolved-term strong {
+  font: 38px Georgia, serif;
+}
+
+.letter-picker {
+  max-width: 520px;
+  margin: 12px auto 30px;
+}
+
+.letter-picker > p {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.letter-answer,
+.letter-bank {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.letter-answer {
+  margin: 18px 0 24px;
+}
+
+.letter-answer span,
+.letter-bank button {
+  width: 48px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  font: 26px Georgia, serif;
+}
+
+.letter-answer span {
+  border-bottom: 2px solid var(--ink);
+}
+
+.letter-bank button {
+  border: 1px solid var(--ink);
+  background: var(--cream);
+  cursor: pointer;
+}
+
+.letter-bank button:hover:not(:disabled) {
+  background: var(--ink);
+  color: white;
+}
+
+.letter-bank button:disabled {
+  opacity: 0.2;
+}
+
+.undo-letter {
+  margin-top: 18px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  padding: 5px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.path-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.term-row {
+  grid-template-columns: minmax(230px, 2fr) repeat(3, 90px) minmax(110px, 1fr) 105px;
+}
+
+.mastered {
+  padding: 72px 0;
+  border-top: 1px solid var(--line);
+}
+
+.mastered-card {
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  align-items: center;
+  min-height: 310px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--paper);
+  text-align: center;
+}
+
+.mastered-card > button {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.mastered-card > button:hover {
+  background: var(--ink);
+  color: white;
+}
+
+.mastered-card p {
+  margin: 0 0 12px;
+  color: var(--terra);
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.16em;
+}
+
+.mastered-card h3 {
+  margin: 0;
+  font-size: 44px;
+  font-weight: 500;
+}
+
+.mastered-card i {
+  display: block;
+  width: 52px;
+  height: 1px;
+  margin: 28px auto;
+  background: var(--gold);
+}
+
+.mastered-card strong {
+  font: 22px Georgia, serif;
+}
+
+@media (max-width: 760px) {
+  .path-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .term-row {
+    grid-template-columns: 1fr 105px;
+  }
+
+  .mastered-card {
+    grid-template-columns: 44px 1fr 44px;
+    padding: 18px 8px;
+  }
+
+  .mastered-card > button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .mastered-card h3 {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 760px) {
+  .cloze-term {
+    font-size: 34px !important;
+  }
+}

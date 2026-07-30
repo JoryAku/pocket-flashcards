@@ -74,15 +74,22 @@ const isLegacyExample = (set: StudySet) =>
     set.terms
       .slice(0, 3)
       .map((term) => term.term)
-      .join("|") === "Petiole|Sepal|Rhizome");
+      .join("|") === "Petiole|Sepal|Rhizome") ||
+  (set.title === "Plant facts" &&
+    set.terms.map((term) => term.term).join("|") ===
+      "Petiole|Sepal|Rhizome|leaf");
 
 export const migrateLegacyExamples = (sets: StudySet[]) => {
   if (!sets.some(isLegacyExample)) return sets;
   const customSets = sets.filter((set) => !isLegacyExample(set));
-  const examples = seed.map((set) => ({
-    ...set,
-    terms: set.terms.map((term) => ({ ...term })),
-  }));
+  const examples = seed
+    .filter(
+      (example) => !customSets.some((set) => set.title === example.title),
+    )
+    .map((set) => ({
+      ...set,
+      terms: set.terms.map((term) => ({ ...term })),
+    }));
   return [...examples, ...customSets];
 };
 

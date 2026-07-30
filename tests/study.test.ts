@@ -84,9 +84,26 @@ test("cloze generation hides the requested share of letters", () => {
   assert.equal(Array.from(second.missing).length, 5);
 });
 
-test("built-in examples come from the original local JSON backups", () => {
-  assert.equal(seed[0].title, "Plant facts");
-  assert.equal(seed[0].lifetimePoints, 320);
+test("built-in examples demonstrate real learning and mixed progress", () => {
+  assert.equal(seed[0].title, "Plant vocabulary");
+  assert.equal(seed[0].lifetimePoints, 200);
+  assert.deepEqual(
+    seed[0].terms.map(
+      ({ flashcardExposures, wordBankRounds, reviewRounds }) => [
+        flashcardExposures,
+        wordBankRounds,
+        reviewRounds,
+      ],
+    ),
+    [
+      [0, 0, 0],
+      [2, 0, 0],
+      [4, 0, 0],
+      [4, 1, 0],
+      [4, 3, 1],
+      [4, 3, 3],
+    ],
+  );
   assert.equal(
     seed[1].title,
     "Ngā mata o te maramataka — Ngāti Kahungunu sequence",
@@ -122,7 +139,7 @@ test("legacy samples are replaced without removing custom sets", () => {
   assert.deepEqual(
     migrated.map(({ title }) => title),
     [
-      "Plant facts",
+      "Plant vocabulary",
       "Ngā mata o te maramataka — Ngāti Kahungunu sequence",
       "My own set",
     ],

@@ -4,9 +4,11 @@ import {
   completion,
   makeCloze,
   makeTerm,
+  migrateLegacyExamples,
   normalizeAnswer,
   safeSets,
   stageFor,
+  seed,
   type StudySet,
 } from "../src/study.ts";
 
@@ -80,4 +82,49 @@ test("cloze generation hides the requested share of letters", () => {
   const second = makeCloze("abcdefghij", 0.5, "round-two");
   assert.equal(Array.from(first.missing).length, 2);
   assert.equal(Array.from(second.missing).length, 5);
+});
+
+test("built-in examples come from the original local JSON backups", () => {
+  assert.equal(seed[0].title, "Plant facts");
+  assert.equal(seed[0].lifetimePoints, 320);
+  assert.equal(
+    seed[1].title,
+    "Ngā mata o te maramataka — Ngāti Kahungunu sequence",
+  );
+  assert.equal(seed[1].terms.length, 30);
+  assert.deepEqual(
+    seed[1].terms.slice(0, 3).map(({ term, description }) => [
+      term,
+      description,
+    ]),
+    [
+      ["Whiro", "1"],
+      ["Tirea", "2"],
+      ["Hoata", "3"],
+    ],
+  );
+});
+
+test("legacy samples are replaced without removing custom sets", () => {
+  const custom = { ...makeSet(), id: "custom", title: "My own set" };
+  const legacy = {
+    ...makeSet(),
+    id: "spanish",
+    title: "Spanish essentials",
+    terms: [
+      makeTerm("la ventana", "window"),
+      makeTerm("el jardín", "garden"),
+      makeTerm("la llave", "key"),
+      makeTerm("despacio", "slowly"),
+    ],
+  };
+  const migrated = migrateLegacyExamples([legacy, custom]);
+  assert.deepEqual(
+    migrated.map(({ title }) => title),
+    [
+      "Plant facts",
+      "Ngā mata o te maramataka — Ngāti Kahungunu sequence",
+      "My own set",
+    ],
+  );
 });

@@ -1,0 +1,63 @@
+{
+  "id": "b8826bb4-ffd6-4e94-b6c3-cb5485c53117",
+  "title": "Plant facts",
+  "lifetimePoints": 320,
+  "wordBankUnlocked": true,
+  "reviewUnlocked": true,
+  "createdAt": "2026-07-22T05:48:58.101Z",
+  "updatedAt": "2026-07-24T02:58:40.629Z",
+  "terms": [
+    {
+      "id": "1ee6ea89-e62b-4629-a301-ae42700ae64a",
+      "term": "Petiole",
+      "description": "The stalk joining a leaf to a stem",
+      "points": 80,
+      "attempts": 10,
+      "correct": 6,
+      "streak": 2,
+      "bestStreak": 3,
+      "flashcardExposures": 4,
+      "wordBankRounds": 3,
+      "reviewRounds": 3
+    },
+    {
+      "id": "8076e80c-c1f6-4def-a39f-f94c24c3ce05",
+      "term": "Sepal",
+      "description": "A leaf-like part protecting a flower bud",
+      "points": 80,
+      "attempts": 8,
+      "correct": 6,
+      "streak": 2,
+      "bestStreak": 3,
+      "flashcardExposures": 4,
+      "wordBankRounds": 3,
+      "reviewRounds": 3
+    },
+    {
+      "id": "3ed915a6-77fa-4db3-8ed4-a19d945fe7ce",
+      "term": "Rhizome",
+      "description": "A horizontal underground plant stem",
+      "points": 80,
+      "attempts": 9,
+      "correct": 6,
+      "streak": 1,
+      "bestStreak": 3,
+      "flashcardExposures": 4,
+      "wordBankRounds": 3,
+      "reviewRounds": 3
+    },
+    {
+      "id": "4b73e9c9-a64b-416c-b0e3-e4255578a311",
+      "term": "leaf",
+      "description": "sun part",
+      "points": 80,
+      "attempts": 6,
+      "correct": 6,
+      "streak": 6,
+      "bestStreak": 6,
+      "flashcardExposures": 4,
+      "wordBankRounds": 3,
+      "reviewRounds": 3
+    }
+  ]
+}

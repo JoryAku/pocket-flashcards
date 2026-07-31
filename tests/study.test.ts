@@ -1,12 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  applyRetentionResult,
   completion,
+  eligibleRecallTerms,
   makeCloze,
   makeTerm,
   migrateLegacyExamples,
   normalizeAnswer,
+  retentionPercentage,
   safeSets,
+  selectRecallTerms,
   stageFor,
   seed,
   type StudySet,
@@ -70,6 +74,8 @@ test("import validates the schema, clamps rounds, and recalculates score", () =>
   assert.equal(set.terms[0].flashcardExposures, 4);
   assert.equal(set.terms[0].wordBankRounds, 3);
   assert.equal(set.terms[0].reviewRounds, 3);
+  assert.equal(set.terms[0].retentionAttempts, 0);
+  assert.equal(set.terms[0].retentionCorrect, 0);
   assert.throws(() => safeSets({ title: "Broken" }), /not a Pocket Flashcards/);
 });
 
@@ -144,4 +150,59 @@ test("legacy samples are replaced without removing custom sets", () => {
       "My own set",
     ],
   );
+});
+
+test("recall tests choose up to five unique flashcard-ready terms", () => {
+  const first = makeSet();
+  first.id = "first";
+  first.terms = Array.from({ length: 4 }, (_, index) => ({
+    ...makeTerm(`Ready ${index}`, `${index}`),
+    id: `ready-${index}`,
+    flashcardExposures: 4,
+  }));
+  const second = makeSet();
+  second.id = "second";
+  second.terms = [
+    { ...makeTerm("Ready 4", "4"), id: "ready-4", flashcardExposures: 4 },
+    { ...makeTerm("Ready 5", "5"), id: "ready-5", flashcardExposures: 4 },
+    { ...makeTerm("Not ready", "6"), id: "not-ready", flashcardExposures: 3 },
+  ];
+
+  assert.equal(eligibleRecallTerms([first, second]).length, 6);
+  const selected = selectRecallTerms([first, second], 5, () => 0.25);
+  assert.equal(selected.length, 5);
+  assert.equal(new Set(selected.map(({ termId }) => termId)).size, 5);
+  assert.ok(selected.every(({ termId }) => termId !== "not-ready"));
+});
+
+test("retention results stay separate from learning progress and score", () => {
+  const set = makeSet();
+  set.terms[0] = {
+    ...set.terms[0],
+    points: 25,
+    flashcardExposures: 4,
+    wordBankRounds: 2,
+  };
+  set.lifetimePoints = 25;
+
+  const afterCorrect = applyRetentionResult(
+    [set],
+    { setId: set.id, termId: set.terms[0].id, correct: true },
+    "2026-02-01T00:00:00.000Z",
+  );
+  const afterIncorrect = applyRetentionResult(
+    afterCorrect,
+    { setId: set.id, termId: set.terms[0].id, correct: false },
+    "2026-02-02T00:00:00.000Z",
+  );
+  const term = afterIncorrect[0].terms[0];
+
+  assert.equal(term.retentionAttempts, 2);
+  assert.equal(term.retentionCorrect, 1);
+  assert.equal(retentionPercentage(term), 50);
+  assert.equal(term.lastTestedAt, "2026-02-02T00:00:00.000Z");
+  assert.equal(term.points, 25);
+  assert.equal(term.flashcardExposures, 4);
+  assert.equal(term.wordBankRounds, 2);
+  assert.equal(afterIncorrect[0].lifetimePoints, 25);
 });

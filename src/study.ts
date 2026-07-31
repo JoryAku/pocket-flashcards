@@ -13,6 +13,9 @@ export type Term = {
   flashcardExposures: number;
   wordBankRounds: number;
   reviewRounds: number;
+  retentionAttempts: number;
+  retentionCorrect: number;
+  lastTestedAt?: string;
 };
 
 export type StudySet = {
@@ -29,7 +32,22 @@ export type StudySet = {
 export type View =
   | { kind: "library" }
   | { kind: "set"; id: string }
-  | { kind: "study"; id: string; stage: "flash" | "bank" | "review" };
+  | { kind: "study"; id: string; stage: "flash" | "bank" | "review" }
+  | { kind: "test" };
+
+export type RecallTerm = {
+  setId: string;
+  setTitle: string;
+  termId: string;
+  term: string;
+  description: string;
+};
+
+export type RetentionResult = {
+  setId: string;
+  termId: string;
+  correct: boolean;
+};
 
 export const uid = () => crypto.randomUUID();
 
@@ -45,12 +63,23 @@ export const makeTerm = (term: string, description: string): Term => ({
   flashcardExposures: 0,
   wordBankRounds: 0,
   reviewRounds: 0,
+  retentionAttempts: 0,
+  retentionCorrect: 0,
 });
 
 const maramatakaCreatedAt = "2026-07-22T00:00:00.000Z";
 
+const plantExample: StudySet = {
+  ...plantFacts,
+  terms: plantFacts.terms.map((term) => ({
+    ...term,
+    retentionAttempts: 0,
+    retentionCorrect: 0,
+  })),
+};
+
 export const seed: StudySet[] = [
-  plantFacts as StudySet,
+  plantExample,
   {
     id: "maramataka-ngati-kahungunu",
     title: maramataka.title,
@@ -104,6 +133,62 @@ export const completion = (term: Term) =>
 
 export const completed = (set: StudySet) =>
   set.terms.filter((term) => completion(term) === 100).length;
+
+export const retentionPercentage = (term: Term) =>
+  term.retentionAttempts
+    ? Math.round((term.retentionCorrect / term.retentionAttempts) * 100)
+    : 0;
+
+export const eligibleRecallTerms = (sets: StudySet[]): RecallTerm[] =>
+  sets.flatMap((set) =>
+    set.terms
+      .filter((term) => term.flashcardExposures >= 4)
+      .map((term) => ({
+        setId: set.id,
+        setTitle: set.title,
+        termId: term.id,
+        term: term.term,
+        description: term.description,
+      })),
+  );
+
+export const selectRecallTerms = (
+  sets: StudySet[],
+  limit = 5,
+  random: () => number = Math.random,
+) => {
+  const terms = eligibleRecallTerms(sets);
+  for (let index = terms.length - 1; index > 0; index--) {
+    const target = Math.floor(random() * (index + 1));
+    [terms[index], terms[target]] = [terms[target], terms[index]];
+  }
+  return terms.slice(0, Math.max(0, limit));
+};
+
+export const applyRetentionResult = (
+  sets: StudySet[],
+  result: RetentionResult,
+  testedAt = new Date().toISOString(),
+) =>
+  sets.map((set) =>
+    set.id !== result.setId
+      ? set
+      : {
+          ...set,
+          updatedAt: testedAt,
+          terms: set.terms.map((term) =>
+            term.id !== result.termId
+              ? term
+              : {
+                  ...term,
+                  retentionAttempts: term.retentionAttempts + 1,
+                  retentionCorrect:
+                    term.retentionCorrect + (result.correct ? 1 : 0),
+                  lastTestedAt: testedAt,
+                },
+          ),
+        },
+  );
 
 export const stageFor = (set: StudySet): "flash" | "bank" | "review" =>
   set.terms.some((term) => term.flashcardExposures < 4)
@@ -186,6 +271,14 @@ export const safeSets = (value: unknown): StudySet[] => {
         flashcardExposures: Math.min(4, Number(term.flashcardExposures) || 0),
         wordBankRounds: Math.min(3, Number(term.wordBankRounds) || 0),
         reviewRounds: Math.min(3, Number(term.reviewRounds) || 0),
+        retentionAttempts: Math.max(
+          0,
+          Number(term.retentionAttempts) || 0,
+        ),
+        retentionCorrect: Math.max(0, Number(term.retentionCorrect) || 0),
+        ...(typeof term.lastTestedAt === "string"
+          ? { lastTestedAt: term.lastTestedAt }
+          : {}),
       };
     });
 

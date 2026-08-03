@@ -1,0 +1,44 @@
+[
+  {
+    "id": "maori-place-name-components",
+    "title": "Ngā wāhanga o ngā ingoa wāhi · Place-name building blocks",
+    "lifetimePoints": 0,
+    "wordBankUnlocked": false,
+    "reviewUnlocked": false,
+    "createdAt": "2026-08-04T00:00:00.000Z",
+    "updatedAt": "2026-08-04T00:00:00.000Z",
+    "terms": [
+      { "id": "component-awa", "term": "awa", "description": "river" },
+      { "id": "component-iti", "term": "iti", "description": "small or little" },
+      { "id": "component-manga", "term": "manga", "description": "stream" },
+      { "id": "component-maunga", "term": "maunga", "description": "mountain" },
+      { "id": "component-moana", "term": "moana", "description": "sea or large inland lake" },
+      { "id": "component-motu", "term": "motu", "description": "island" },
+      { "id": "component-nui", "term": "nui", "description": "large or big" },
+      { "id": "component-one", "term": "one", "description": "sand or earth" },
+      { "id": "component-puke", "term": "puke", "description": "hill" },
+      { "id": "component-roa", "term": "roa", "description": "long" },
+      { "id": "component-roto", "term": "roto", "description": "lake or inside" },
+      { "id": "component-wai", "term": "wai", "description": "water" },
+      { "id": "component-whanga", "term": "whanga", "description": "harbour or bay" }
+    ]
+  },
+  {
+    "id": "maori-place-names-practice",
+    "title": "Ngā ingoa wāhi Māori · Māori place names",
+    "lifetimePoints": 275,
+    "wordBankUnlocked": true,
+    "reviewUnlocked": true,
+    "createdAt": "2026-08-04T00:00:00.000Z",
+    "updatedAt": "2026-08-04T00:00:00.000Z",
+    "terms": [
+      { "id": "place-aotearoa", "term": "Aotearoa", "description": "Land of the long white cloud", "points": 0, "attempts": 0, "correct": 0, "streak": 0, "bestStreak": 0, "flashcardExposures": 0, "wordBankRounds": 0, "reviewRounds": 0 },
+      { "id": "place-aramoana", "term": "Aramoana", "description": "Sea pathway", "points": 10, "attempts": 0, "correct": 0, "streak": 0, "bestStreak": 0, "flashcardExposures": 2, "wordBankRounds": 0, "reviewRounds": 0 },
+      { "id": "place-kaikoura", "term": "Kaikōura", "description": "Eat crayfish", "points": 20, "attempts": 0, "correct": 0, "streak": 0, "bestStreak": 0, "flashcardExposures": 4, "wordBankRounds": 0, "reviewRounds": 0 },
+      { "id": "place-kirikiriroa", "term": "Kirikiriroa", "description": "Long gravel", "points": 40, "attempts": 2, "correct": 2, "streak": 2, "bestStreak": 2, "flashcardExposures": 4, "wordBankRounds": 2, "reviewRounds": 0 },
+      { "id": "place-maungakiekie", "term": "Maungakiekie", "description": "Kiekie plant mountain", "points": 60, "attempts": 4, "correct": 4, "streak": 4, "bestStreak": 4, "flashcardExposures": 4, "wordBankRounds": 3, "reviewRounds": 1 },
+      { "id": "place-motutapu", "term": "Motutapu", "description": "Sacred island", "points": 70, "attempts": 5, "correct": 5, "streak": 5, "bestStreak": 5, "flashcardExposures": 4, "wordBankRounds": 3, "reviewRounds": 2 },
+      { "id": "place-rotorua", "term": "Rotorua", "description": "Two lakes", "points": 75, "attempts": 6, "correct": 6, "streak": 6, "bestStreak": 6, "flashcardExposures": 4, "wordBankRounds": 3, "reviewRounds": 3 }
+    ]
+  }
+]

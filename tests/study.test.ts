@@ -91,10 +91,27 @@ test("cloze generation hides the requested share of letters", () => {
 });
 
 test("built-in examples demonstrate real learning and mixed progress", () => {
-  assert.equal(seed[0].title, "Plant vocabulary");
-  assert.equal(seed[0].lifetimePoints, 200);
+  assert.equal(
+    seed[0].title,
+    "Ngā wāhanga o ngā ingoa wāhi · Place-name building blocks",
+  );
+  assert.equal(seed[0].lifetimePoints, 0);
+  assert.equal(seed[0].terms.length, 13);
   assert.deepEqual(
-    seed[0].terms.map(
+    seed[0].terms.slice(0, 3).map(({ term, description }) => [
+      term,
+      description,
+    ]),
+    [
+      ["awa", "river"],
+      ["iti", "small or little"],
+      ["manga", "stream"],
+    ],
+  );
+  assert.equal(seed[1].title, "Ngā ingoa wāhi Māori · Māori place names");
+  assert.equal(seed[1].lifetimePoints, 275);
+  assert.deepEqual(
+    seed[1].terms.map(
       ({ flashcardExposures, wordBankRounds, reviewRounds }) => [
         flashcardExposures,
         wordBankRounds,
@@ -105,25 +122,10 @@ test("built-in examples demonstrate real learning and mixed progress", () => {
       [0, 0, 0],
       [2, 0, 0],
       [4, 0, 0],
-      [4, 1, 0],
+      [4, 2, 0],
       [4, 3, 1],
+      [4, 3, 2],
       [4, 3, 3],
-    ],
-  );
-  assert.equal(
-    seed[1].title,
-    "Ngā mata o te maramataka — Ngāti Kahungunu sequence",
-  );
-  assert.equal(seed[1].terms.length, 30);
-  assert.deepEqual(
-    seed[1].terms.slice(0, 3).map(({ term, description }) => [
-      term,
-      description,
-    ]),
-    [
-      ["Whiro", "1"],
-      ["Tirea", "2"],
-      ["Hoata", "3"],
     ],
   );
 });
@@ -145,10 +147,38 @@ test("legacy samples are replaced without removing custom sets", () => {
   assert.deepEqual(
     migrated.map(({ title }) => title),
     [
-      "Plant vocabulary",
-      "Ngā mata o te maramataka — Ngāti Kahungunu sequence",
+      "Ngā wāhanga o ngā ingoa wāhi · Place-name building blocks",
+      "Ngā ingoa wāhi Māori · Māori place names",
       "My own set",
     ],
+  );
+});
+
+test("the previous built-in examples migrate after browser storage regenerates ids", () => {
+  const previousPlant = {
+    ...makeSet(),
+    id: "regenerated-id",
+    title: "Plant vocabulary",
+    terms: [
+      makeTerm("Petiole", "one"),
+      makeTerm("Sepal", "two"),
+      makeTerm("Rhizome", "three"),
+    ],
+  };
+  const previousMaramataka = {
+    ...makeSet(),
+    id: "another-regenerated-id",
+    title: "Ngā mata o te maramataka — Ngāti Kahungunu sequence",
+    terms: Array.from({ length: 30 }, (_, index) =>
+      makeTerm(["Whiro", "Tirea", "Hoata"][index] || `Mata ${index}`, `${index + 1}`),
+    ),
+  };
+
+  assert.deepEqual(
+    migrateLegacyExamples([previousPlant, previousMaramataka]).map(
+      ({ title }) => title,
+    ),
+    seed.map(({ title }) => title),
   );
 });
 

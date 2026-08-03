@@ -1,5 +1,4 @@
-import maramataka from "./data/maramataka.json" with { type: "json" };
-import plantFacts from "./data/plant-facts.json" with { type: "json" };
+import maoriLanguageWeek from "./data/maori-language-week.json" with { type: "json" };
 
 export type Term = {
   id: string;
@@ -67,35 +66,26 @@ export const makeTerm = (term: string, description: string): Term => ({
   retentionCorrect: 0,
 });
 
-const maramatakaCreatedAt = "2026-07-22T00:00:00.000Z";
-
-const plantExample: StudySet = {
-  ...plantFacts,
-  terms: plantFacts.terms.map((term) => ({
+export const seed: StudySet[] = maoriLanguageWeek.map((set) => ({
+  ...set,
+  terms: set.terms.map((term) => ({
+    ...makeTerm(term.term, term.description),
     ...term,
     retentionAttempts: 0,
     retentionCorrect: 0,
   })),
-};
-
-export const seed: StudySet[] = [
-  plantExample,
-  {
-    id: "maramataka-ngati-kahungunu",
-    title: maramataka.title,
-    lifetimePoints: 0,
-    wordBankUnlocked: false,
-    reviewUnlocked: false,
-    createdAt: maramatakaCreatedAt,
-    updatedAt: maramatakaCreatedAt,
-    terms: maramataka.terms.map(({ term, description }, index) => ({
-      ...makeTerm(term, description),
-      id: `maramataka-${index + 1}`,
-    })),
-  },
-];
+}));
 
 const isLegacyExample = (set: StudySet) =>
+  set.id === "plant-progress-example" ||
+  set.id === "maramataka-ngati-kahungunu" ||
+  (set.title === "Plant vocabulary" &&
+    set.terms.slice(0, 3).map((term) => term.term).join("|") ===
+      "Petiole|Sepal|Rhizome") ||
+  (set.title === "Ngā mata o te maramataka — Ngāti Kahungunu sequence" &&
+    set.terms.length === 30 &&
+    set.terms.slice(0, 3).map((term) => term.term).join("|") ===
+      "Whiro|Tirea|Hoata") ||
   (set.title === "Spanish essentials" &&
     set.terms.map((term) => term.term).join("|") ===
       "la ventana|el jardín|la llave|despacio") ||

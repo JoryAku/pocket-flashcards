@@ -232,6 +232,34 @@ export const makeLetterBank = (value: string, seedValue: string) => {
   return letters;
 };
 
+export const makeWordBankChoices = (
+  current: Term,
+  terms: Term[],
+  seedValue: string,
+) => {
+  const distractors = Array.from(
+    new Set(
+      terms
+        .filter((term) => term.id !== current.id && term.term !== current.term)
+        .map((term) => term.term),
+    ),
+  );
+  let state = Array.from(seedValue).reduce(
+    (hash, character) => (hash * 33 + character.codePointAt(0)!) >>> 0,
+    5381,
+  );
+  const shuffle = (values: string[]) => {
+    for (let index = values.length - 1; index > 0; index--) {
+      state = (state * 1664525 + 1013904223) >>> 0;
+      const target = Math.floor((state / 4294967296) * (index + 1));
+      [values[index], values[target]] = [values[target], values[index]];
+    }
+    return values;
+  };
+  const selectedDistractors = shuffle(distractors).slice(0, 3);
+  return shuffle([current.term, ...selectedDistractors]);
+};
+
 export const safeSets = (value: unknown): StudySet[] => {
   const raw = Array.isArray(value) ? value : [value];
   if (!raw.length) throw new Error("No study sets found");

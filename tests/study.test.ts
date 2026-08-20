@@ -6,6 +6,7 @@ import {
   eligibleRecallTerms,
   makeCloze,
   makeTerm,
+  makeWordBankChoices,
   migrateLegacyExamples,
   normalizeAnswer,
   retentionPercentage,
@@ -88,6 +89,21 @@ test("cloze generation hides the requested share of letters", () => {
   const second = makeCloze("abcdefghij", 0.5, "round-two");
   assert.equal(Array.from(first.missing).length, 2);
   assert.equal(Array.from(second.missing).length, 5);
+});
+
+test("word-bank choices are shuffled, stable, unique, and include the answer", () => {
+  const terms = ["Awa", "Maunga", "Moana", "Motu", "Puke"].map((term) =>
+    makeTerm(term, `${term} description`),
+  );
+  const first = makeWordBankChoices(terms[0], terms, "question-one");
+  const repeated = makeWordBankChoices(terms[0], terms, "question-one");
+  const next = makeWordBankChoices(terms[0], terms, "question-two");
+
+  assert.deepEqual(first, repeated);
+  assert.equal(first.length, 4);
+  assert.equal(new Set(first).size, 4);
+  assert.ok(first.includes("Awa"));
+  assert.notDeepEqual(first, next);
 });
 
 test("built-in examples demonstrate real learning and mixed progress", () => {

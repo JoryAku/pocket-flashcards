@@ -7,6 +7,7 @@ import {
   eligibleRecallTerms,
   makeCloze,
   makeLetterBank,
+  makeWordBankChoices,
   makeTerm,
   migrateLegacyExamples,
   normalizeAnswer,
@@ -100,7 +101,7 @@ function Study({set,stage,exit,update}:{set:StudySet;stage:"flash"|"bank"|"revie
  const needsStage=(t:Term)=>stage==="flash"?t.flashcardExposures<4:stage==="bank"?t.flashcardExposures>=4&&t.wordBankRounds<3:t.wordBankRounds>=3&&t.reviewRounds<3;
  const eligible=set.terms.filter(needsStage);const [index,setIndex]=useState(0);const [revealed,setRevealed]=useState(false);const [answer,setAnswer]=useState("");const [selectedLetters,setSelectedLetters]=useState<number[]>([]);const [feedback,setFeedback]=useState<null|boolean>(null);const [current,setCurrent]=useState<Term|undefined>(()=>eligible[0]);
  const flip=(current?.flashcardExposures??0)%2===1;const title=stage==="flash"?tr("Flash cards"):stage==="bank"?tr("Word bank"):tr("Term review");
- const choices=useMemo(()=>current?[current.term,...set.terms.filter(t=>t.id!==current.id).map(t=>t.term)].slice(0,4).sort((a,b)=>a.localeCompare(b)):[],[current,set.terms]);
+ const choices=useMemo(()=>current?makeWordBankChoices(current,set.terms,`${set.id}-${index}-${current.id}-${current.wordBankRounds}`):[],[current,index,set.id,set.terms]);
  const cloze=useMemo(()=>current&&current.reviewRounds<2?makeCloze(current.term,current.reviewRounds===0?.15:.5,`${current.id}-${current.reviewRounds}`):null,[current]);
  const letterBank=useMemo(()=>{
    if(!cloze||!current)return [];
